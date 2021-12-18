@@ -69,47 +69,56 @@ end
 gc.setDefaultFilter('linear','linear')
 
 
-TEXTURE.title=NSC(1040,236)--Title image (Middle: 580,118)
+
+TEXTURE.title=NSC(1160,236)--Title image (Middle: 580,118)
 do
-    gc.translate(10,10)
-    gc.setColor(.2,.2,.2)
-    for i=1,#SVG_TITLE_FILL do
-        local triangles=love.math.triangulate(SVG_TITLE_FILL[i])
+    for i=1,8 do
+        local triangles=love.math.triangulate(SVG_TITLE[i])
+
+        gc.translate(12*i,i==1 and 8 or 14)
+
+        gc.setLineWidth(16)
+        gc.setColor(COLOR.Z)
+        gc.polygon('line',SVG_TITLE[i])
+
+        gc.setColor(.2,.2,.2)
         for j=1,#triangles do
             gc.polygon('fill',triangles[j])
         end
     end
-    gc.setLineWidth(6)
-    gc.setColor(COLOR.Z)
-    for i=1,#SVG_TITLE_LINE do
-        gc.polygon('line',SVG_TITLE_LINE[i])
-    end
     gc.translate(-10,-10)
 end
 
-TEXTURE.title_color=NSC(1040,236)--Title image (colored)
+
+TEXTURE.title_color=NSC(1160,236)--Title image (colored)
 do
     local titleColor={COLOR.P,COLOR.F,COLOR.V,COLOR.A,COLOR.M,COLOR.N,COLOR.W,COLOR.Y}
 
-    gc.translate(10,10)
-    for i=1,#SVG_TITLE_FILL do
-        local triangles=love.math.triangulate(SVG_TITLE_FILL[i])
+    for i=1,8 do
+        local triangles=love.math.triangulate(SVG_TITLE[i])
+
+        gc.translate(12*i,i==1 and 8 or 14)
+
+        gc.setLineWidth(16)
+        gc.setColor(COLOR.Z)
+        gc.polygon('line',SVG_TITLE[i])
+
+        gc.setLineWidth(4)
         gc.setColor(COLOR.D)
         for j=1,#triangles do
             gc.polygon('fill',triangles[j])
         end
 
         gc.setColor(.2+.8*titleColor[i][1],.2+.8*titleColor[i][2],.2+.8*titleColor[i][3],.3)
+        gc.translate(-4,-4)
         for j=1,#triangles do
             gc.polygon('fill',triangles[j])
         end
+		
+        gc.translate(4,4)
+
+        gc.translate(-12*i,i==1 and -8 or -14)
     end
-    gc.setLineWidth(6)
-    gc.setColor(COLOR.Z)
-    for i=1,#SVG_TITLE_LINE do
-        gc.polygon('line',SVG_TITLE_LINE[i])
-    end
-    gc.translate(-10,-10)
 end
 
 TEXTURE.multiple=GC.DO{15,15,
