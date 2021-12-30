@@ -12,18 +12,18 @@ local counter
 
 function scene.sceneInit()
     time=0
-    v=12
+    v=22.6
     BG.set()
     names={}
     counter=26
 end
 
 function scene.mouseDown(x,y)
-    local T=40*math.min(time,45)
+    local T=40*math.min(time,185)
     if x>330 and x<950 then
-        if math.abs(y-800+T)<70 then
+        if math.abs(y-900+T)<70 then
             loadGame('sprintLock',true)
-        elseif math.abs(y-2160+T)<70 then
+        elseif math.abs(y-7770+T)<70 then
             loadGame('sprintFix',true)
         end
     end
@@ -35,16 +35,16 @@ function scene.keyDown(key)
         loadGame('sprintLock',true)
     elseif key=='f'then
         loadGame('sprintFix',true)
-    else
-        return true
+    elseif key=='escape'then
+        SCN.back()
     end
 end
 
 function scene.update(dt)
-    if(kb.isDown('space','return')or tc.getTouches()[1])and v<6.26 then
-        v=v+.26
-    elseif v>1 then
-        v=v-.16
+    if(kb.isDown('space','return')or tc.getTouches()[1])and v<16.2 then
+        v=v+.42
+    elseif v>3.55 then
+        v=v-.42
     end
     time=time+v*dt
     counter=counter-1
@@ -79,17 +79,17 @@ function scene.draw()
     end
 
     gc.replaceTransform(SCR.xOy)
-    local T=40*math.min(time,45)
-    gc.setColor(.97,.97,.97,45-math.min(time,45))
+    local T=40*math.min(time,185)
+    gc.setColor(.97,.97,.97,185-math.min(time,185))
     local L=text.staff
     setFont(40)
     for i=1,#L do
-        mStr(L[i],640,800+70*i-T)
+        mStr(L[i],640,950+70*i-T)
     end
     gc.setColor(1,1,1)
-    mDraw(TEXTURE.title_color,640,800-T,nil,.6)
-    mDraw(TEXTURE.title,640,2160-T,nil,.6)
-    if time>50 then
+    mDraw(TEXTURE.title_color,640,900-T,nil,.6)
+    mDraw(TEXTURE.title,640,7770-T,nil,.6)
+    if time>190 then
         gc.print("CLICK ME →",50,550,-.5)
     end
 end

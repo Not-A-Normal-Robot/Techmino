@@ -175,21 +175,7 @@ return{
         FNNS and"/"or"Por favor descarga las últimas versiones desde los sitios oficiales. El juego es gratuito",
         FNNS and"/"or"Ve el Zictionary (en inglés) para más info",
     },
-    staff={
-        "Autor:MrZ  Email: 1046101471@qq.com",
-        "Creado con LÖVE",
-        "",
-        "Programación: MrZ, Particle_G, [scdhh, FinnTenzor]",
-        "Artistas: MrZ, Gnyar, C₂₉H₂₅N₃O₅, ScF, [旋律星萤, T0722]",
-        "Música: MrZ, 柒栎流星, ERM, Trebor, C₂₉H₂₅N₃O₅, [T0722, Aether]",
-        "Voces/Sonidos: Miya, Xiaoya, Mono, MrZ, Trebor",
-        "Performance: 模电, HBM",
-        "Traducción: User670, MattMayuga, Mizu, Mr.Faq, ScF, C₂₉H₂₅N₃O₅, NOT_A_ROBOT",
-        "",
-        "Agradecimientos:",
-        "Flyz, Big_True, NOT_A_ROBOT, 思竣, yuhao7370",
-        "Farter, Teatube, 蕴空之灵, T9972, [Todo el Staff de Testeo]",
-    },
+
     used=[[
     Herramientas utilizadas:
         Beepbox

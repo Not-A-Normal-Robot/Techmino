@@ -24,7 +24,7 @@ VERSION=require"version"
 TIME=love.timer.getTime
 YIELD=coroutine.yield
 SYSTEM=love.system.getOS()if SYSTEM=='OS X'then SYSTEM='macOS'end
-FNNS=true or SYSTEM:find'\79\83'--What does FNSF stand for? IDK so don't ask me lol
+FNNS=SYSTEM:find'\79\83'--What does FNSF stand for? IDK so don't ask me lol
 MOBILE=SYSTEM=='Android'or SYSTEM=='iOS'
 SAVEDIR=fs.getSaveDirectory()
 
@@ -184,6 +184,15 @@ Z.setOnFnKeys({
     function()for k,v in next,_G do print(k,v)end end,
     function()if love['_openConsole']then love['_openConsole']()end end,
 })
+Z.setDebugInfo{
+    {"Cache",gcinfo},
+    {"Tasks",TASK.getCount},
+    {"Voices",VOC.getQueueCount},
+    {"Audios",love.audio.getSourceCount},
+}
+Z.setOnResize(function(w,_)
+    SHADER.warning:send('w',w*SCR.dpi)
+end)
 do--Z.setOnFocus
     local function task_autoSoundOff()
         while true do
@@ -333,11 +342,11 @@ SFX.init((function()--[Warning] Not loading files here, just get the list of sou
     end
     return L
 end)())
-BGM.init((function()
+BGM.load((function()
     local L={}
     for _,v in next,fs.getDirectoryItems('media/music')do
         if isSafeFile('media/music/'..v,"Dangerous file : %SAVE%/media/music/"..v)then
-            table.insert(L,{name=v:sub(1,-5),path='media/music/'..v})
+            L[v:sub(1,-5)]='media/music/'..v
         end
     end
     return L
@@ -363,8 +372,8 @@ LANG.init('zh',
         es=require'parts.language.lang_es',
         pt=require'parts.language.lang_pt',
         id=require'parts.language.lang_id',
+        ja=require'parts.language.lang_ja',
         zh_grass=require'parts.language.lang_zh_grass',
-        zh_yygq=require'parts.language.lang_yygq',
         symbol=require'parts.language.lang_symbol',
         --1. Add language file to LANG folder;
         --2. Require it;
@@ -540,6 +549,7 @@ do
     if SETTING.cv then SETTING.vocPack,SETTING.cv=SETTING.cv end
     if type(SETTING.bg)~='string'then SETTING.bg='on'end
     if SETTING.skin[18]==10 then SETTING.skin[18]=4 end
+    if SETTING.reTime>3 or SETTING.reTime<.5 then SETTING.reTime=2 end
     if RANKS.infinite then RANKS.infinite=0 end
     if RANKS.infinite_dig then RANKS.infinite_dig=0 end
     if not RANKS.sprint_10l then RANKS.sprint_10l=0 end
