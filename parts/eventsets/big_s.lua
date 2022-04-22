@@ -13,11 +13,11 @@ return
         gc.setColor(.98,.98,.98,.4)
         gc.rectangle('fill',0+2,260+2,126-4,80-4,2)
         setFont(45)
-        local t=P.stat.frame/60
+        local t=math.min(P.stat.frame/60,60)
         local T=("%.1f"):format(60-t)
         gc.setColor(COLOR.dH)
         mStr(T,65,270)
-        t=t/120
+        t=t/60
         gc.setColor(1.7*t,2.3-2*t,.3)
         mStr(T,63,268)
     end,
@@ -32,7 +32,7 @@ return
         while true do
             YIELD()
             if P.stat.frame>3600 then
-                P.win('finish')
+                P:win('finish')
                 break
             end
         end
