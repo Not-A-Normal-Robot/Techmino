@@ -238,6 +238,12 @@ return{
         "(旋律星萤)",
         "(T0722)",
         "",
+        "Ilustrações",
+        "Miya",
+        "Mono",
+        "Xiaoya",
+        "葉枭",
+        "",
         "Desenhos Musicais",
         "MrZ",
         "柒栎流星",
@@ -304,7 +310,6 @@ return{
         Cold_Clear [MinusKelvin]
         json.lua [rxi]
         profile.lua [itraykov]
-        simple-love-lights [dylhunn]
     ]],
     support="Support author",
     WidgetText={
@@ -448,7 +453,6 @@ return{
             atkFX="Nível FX Atk.",
 
             frame="Render Frame Rate(%)",
-            -- FTlock="Frame-Time Lock",
 
             text="Texto de ação",
             score="Pop-up de pontos",
@@ -678,6 +682,7 @@ return{
             register="Registrar",
             email="Endereço De Email",
             password="Senha",
+            -- showEmail="Show Email",
             -- keepPW="Remember me",
             login="Log in",
         },

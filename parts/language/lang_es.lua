@@ -186,7 +186,6 @@ return{
         Cold_Clear [MinusKelvin]
         json.lua [rxi]
         profile.lua [itraykov]
-        simple-love-lights [dylhunn]
     ]],
     support="Apoyen al Autor",
     WidgetText={
@@ -330,7 +329,6 @@ return{
             atkFX="FX Vis. de Ataque",
 
             frame="Ratio de FPSs(%)",
-            FTlock="Bloqueo por frames",
 
             text="Texto de Acciones",
             score="Puntaje en Pantalla",
@@ -551,6 +549,7 @@ return{
             register="Registrarse",
             email="Correo Elec.",
             password="Contraseña",
+            -- showEmail="Show Email",
             keepPW="Recordar credenciales",
             login="Entrar",
         },

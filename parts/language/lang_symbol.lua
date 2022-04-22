@@ -269,7 +269,6 @@ return{
             atkFX="→→~",
 
             frame="|=|%",
-            FTlock="||=|→→|=||",
 
             text="ABC",
             score="+123",
@@ -489,7 +488,8 @@ return{
             register="Sign up",
             email="@",
             password="*",
-            -- keepPW="I",
+            showEmail="?",
+            keepPW="!",
             login="Log in",
         },
         register={

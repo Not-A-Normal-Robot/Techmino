@@ -96,7 +96,7 @@ return{
 
     noScore="スコア無し",
     modeLocked="ロック",
-    unlockHint="ランクB以上を取得すると解放されるよ!", 
+    unlockHint="ランクB以上を取得すると解放されるよ!",
     highScore="最高得点",
     newRecord="新記録!",
 
@@ -251,6 +251,12 @@ return{
         "(旋律星萤)",
         "(T0722)",
         "",
+        "イラスト",
+        "Miya",
+        "Mono",
+        "Xiaoya",
+        "葉枭",
+        "",
         "ミュージカルデザイン",
         "MrZ",
         "柒栎流星",
@@ -317,7 +323,6 @@ return{
         Cold_Clear [MinusKelvin]
         json.lua [rxi]
         profile.lua [itraykov]
-        simple-love-lights [dylhunn]
     ]],
     support="Support the Author",
     WidgetText={
@@ -461,7 +466,6 @@ return{
             atkFX="攻撃演出",
 
             frame="レンダリングフレームレート(%)",
-            FTlock="フレームスキップ",
 
             text="ライン消去ポップ",
             score="スコアポップ",
@@ -690,6 +694,7 @@ return{
             register="サインアップ",
             email="Eメールアドレス",
             password="パスワード",
+            -- showEmail="Show Email",
             keepPW="常にログイン",
             login="ログイン",
         },

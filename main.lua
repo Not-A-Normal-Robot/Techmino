@@ -30,7 +30,7 @@ SAVEDIR=fs.getSaveDirectory()
 
 --Global Vars & Settings
 SFXPACKS={'chiptune'}
-VOCPACKS={'miya',--[['mono',]]'xiaoya','miku'}
+VOCPACKS={'miya','mono','xiaoya','miku'}
 FIRSTLAUNCH=false
 DAILYLAUNCH=false
 
@@ -180,7 +180,7 @@ Z.setOnFnKeys({
             end
         end
     end,
-    function()print(WIDGET.getSelected()or"no widget selected")end,
+    function()print(BG.locked)end,
     function()for k,v in next,_G do print(k,v)end end,
     function()if love['_openConsole']then love['_openConsole']()end end,
 })
@@ -190,9 +190,6 @@ Z.setDebugInfo{
     {"Voices",VOC.getQueueCount},
     {"Audios",love.audio.getSourceCount},
 }
-Z.setOnResize(function(w,_)
-    SHADER.warning:send('w',w*SCR.dpi)
-end)
 do--Z.setOnFocus
     local function task_autoSoundOff()
         while true do
@@ -234,12 +231,18 @@ end
 Z.setOnQuit(destroyPlayers)
 
 --Load settings and statistics
-TABLE.cover (loadFile('conf/user','-canSkip')or{},USER)
-TABLE.cover (loadFile('conf/unlock','-canSkip')or{},RANKS)
-TABLE.update(loadFile('conf/settings','-canSkip')or{},SETTING)
-TABLE.coverR(loadFile('conf/data','-canSkip')or{},STAT)
-TABLE.cover (loadFile('conf/key','-canSkip')or{},KEY_MAP)
-TABLE.cover (loadFile('conf/virtualkey','-json -canSkip')or{},VK_ORG)
+if
+    not(
+        pcall(TABLE.cover, loadFile('conf/user',      '-json -canSkip')or loadFile('conf/user',      '-luaon -canSkip')or{},USER) and
+        pcall(TABLE.cover, loadFile('conf/unlock',    '-json -canSkip')or loadFile('conf/unlock',    '-luaon -canSkip')or{},RANKS) and
+        pcall(TABLE.update,loadFile('conf/settings',  '-json -canSkip')or loadFile('conf/settings',  '-luaon -canSkip')or{},SETTING) and
+        pcall(TABLE.coverR,loadFile('conf/data',      '-json -canSkip')or loadFile('conf/data',      '-luaon -canSkip')or{},STAT) and
+        pcall(TABLE.cover, loadFile('conf/key',       '-json -canSkip')or loadFile('conf/key',       '-luaon -canSkip')or{},KEY_MAP) and
+        pcall(TABLE.cover, loadFile('conf/virtualkey','-json -canSkip')or loadFile('conf/virtualkey','-luaon -canSkip')or{},VK_ORG)
+    )
+then
+    MES.new('error',"Be careful, an error accured when loading saving, some data was lost")
+end
 
 --Initialize fields, sequence, missions, gameEnv for cutsom game
 local fieldData=loadFile('conf/customBoards','-string -canSkip')
@@ -288,6 +291,15 @@ IMG.init{
     xiaoyaCH='media/image/characters/xiaoya.png',
     xiaoyaOmino='media/image/characters/xiaoya_Omino.png',
     mikuCH='media/image/characters/miku.png',
+    z={
+        character='media/image/characters/z_character.png',
+        screen1='media/image/characters/z_screen1.png',
+        screen2='media/image/characters/z_screen2.png',
+        particle1='media/image/characters/z_particle1.png',
+        particle2='media/image/characters/z_particle2.png',
+        particle3='media/image/characters/z_particle3.png',
+        particle4='media/image/characters/z_particle4.png',
+    },
     electric='media/image/characters/electric.png',
     hbm='media/image/characters/hbm.png',
 

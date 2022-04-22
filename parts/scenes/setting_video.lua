@@ -69,7 +69,6 @@ scene.widgetList={
     WIDGET.newSlider{name='atkFX',        x=330,y=820,lim=280,w=540,axis={0,5,1},disp=SETval('atkFX'),   code=SETsto('atkFX')},
 
     WIDGET.newSelector{name='frame',      x=400,y=890,lim=280,w=460,list={8,10,13,17,22,29,37,47,62,80,100},disp=SETval('frameMul'),code=function(v)SETTING.frameMul=v;Z.setFrameMul(SETTING.frameMul)end},
-    WIDGET.newSwitch{name='FTlock',       x=950,y=890,lim=290,disp=SETval('FTLock'),                code=SETrev('FTLock')},
 
     WIDGET.newSwitch{name='text',         x=450,y=980,lim=360,disp=SETval('text'),                  code=SETrev('text')},
     WIDGET.newSwitch{name='score',        x=450,y=1030,lim=360,disp=SETval('score'),                code=SETrev('score')},
@@ -98,7 +97,14 @@ scene.widgetList={
         },
     WIDGET.newSlider{name='bgAlpha',      x=1020,y=1430,w=200,
         axis={0,.8},disp=SETval('bgAlpha'),
-        code=function(v)SETTING.bgAlpha=v BG.send(v,v,v)end,
+        code=function(v)
+            SETTING.bgAlpha=v
+            if BG.cur=='fixColor' then
+                BG.send(v,v,v)
+            else
+                BG.send(v)
+            end
+        end,
         hideF=function()return SETTING.bg=='on'end
         },
 

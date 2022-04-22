@@ -4,15 +4,6 @@ local sin=math.sin
 local setFont=FONT.set
 
 local author={
-    blank="MrZ (old works)",
-    ["end"]="MrZ (old works)",
-    cruelty="MrZ (old works)",
-    final="MrZ (old works)",
-    infinite="MrZ (old works)",
-    push="MrZ (old works)",
-    race="MrZ (old works)",
-    reason="MrZ (old works)",
-    way="MrZ (old works)",
     battle="Aether & MrZ",
     moonbeam="Beethoven & MrZ",
     empty="ERM",
@@ -75,6 +66,22 @@ function scene.keyDown(key,isRep)
 end
 
 function scene.draw()
+    local t=TIME()
+
+    --Character
+    gc.push('transform')
+        gc.setColor(1,1,1)
+        gc.translate(906,456)
+        gc.scale(.6)
+        GC.draw(IMG.z.character)
+        GC.draw(IMG.z.screen1, -91, -157+16*math.sin(t))
+        GC.draw(IMG.z.screen2, 120, -166+16*math.sin(t+1))
+        gc.setColor(1,1,1,.7+.3*math.sin(.6*t)) GC.draw(IMG.z.particle1, -50,                    42+6*math.sin(t*0.36))
+        gc.setColor(1,1,1,.7+.3*math.sin(.7*t)) GC.draw(IMG.z.particle2, 110+6*math.sin(t*0.92), 55)
+        gc.setColor(1,1,1,.7+.3*math.sin(.8*t)) GC.draw(IMG.z.particle3, -54+6*math.sin(t*0.48), -248)
+        gc.setColor(1,1,1,.7+.3*math.sin(.9*t)) GC.draw(IMG.z.particle4, 133,                    -305+6*math.sin(t*0.40))
+    gc.pop()
+
     gc_setColor(COLOR.Z)
 
     --Scroller
@@ -89,22 +96,23 @@ function scene.draw()
     if selected>2 then gc_print(bgmList[selected-2],322,350-50)end
     if selected<#bgmList-1 then gc_print(bgmList[selected+2],322,350+110)end
 
-    --Music player
-    gc.draw(TEXTURE.title,840,220,nil,.5,nil,580,118)
+    --Title
     if BGM.nowPlay then
-        local t=TIME()
+        GC.draw(TEXTURE.title,570,190,nil,.42)
+        local a=-t%2.3/2.3
+        gc_setColor(1,1,1,math.min(a,1))
+        GC.draw(TEXTURE.title_color,570,190,nil,.42+.062-.062*a)
+    end
+
+    --Music player
+    if BGM.nowPlay then
         setFont(45)
+        GC.shadedPrint(BGM.nowPlay,710,508,'left',2)
         gc_setColor(sin(t*.5)*.2+.8,sin(t*.7)*.2+.8,sin(t)*.2+.8)
         gc_print(BGM.nowPlay,710,508)
         setFont(35)
         gc_setColor(1,sin(t*2.6)*.5+.5,sin(t*2.6)*.5+.5)
         gc_print(author[BGM.nowPlay]or"MrZ",670,465)
-
-        local a=-t%2.3/2
-        if a<1 then
-            gc_setColor(1,1,1,a)
-            gc.draw(TEXTURE.title_color,840,220,nil,.5+.062-.062*a,.5+.126-.126*a,580,118)
-        end
 
         setFont(20)
         gc_setColor(COLOR.Z)

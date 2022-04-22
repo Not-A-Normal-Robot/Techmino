@@ -250,6 +250,12 @@ return{
         "(旋律星萤)",
         "(T0722)",
         "",
+        "插圖",
+        "Miya",
+        "Mono",
+        "Xiaoya",
+        "葉枭",
+        "",
         "音樂設計",
         "MrZ",
         "柒栎流星",
@@ -316,7 +322,6 @@ return{
         Cold_Clear [MinusKelvin]
         json.lua [rxi]
         profile.lua [itraykov]
-        simple-love-lights [dylhunn]
     ]],
     support="支持作者",
     WidgetText={
@@ -460,7 +465,6 @@ return{
             atkFX="攻擊特效",
 
             frame="渲染幀率(%)",
-            FTlock="跳幀",
 
             text="清除文本",
             score="分數動畫",
@@ -688,6 +692,7 @@ return{
             register="註冊",
             email="電郵",
             password="密碼",
+            showEmail="顯示郵箱",
             keepPW="保存密碼",
             login="登錄",
         },
@@ -770,6 +775,10 @@ return{
         ['dig_40l']=        {"挖掘",        "40L",      "挖掘40行"},
         ['dig_100l']=       {"挖掘",        "100L",     "挖掘100行"},
         ['dig_400l']=       {"挖掘",        "400L",     "挖掘400行"},
+        ['dig_eff_10l']=    {"挖掘",        "效率 10L", "挖掘10行用最少的件數"},
+        ['dig_eff_40l']=    {"挖掘",        "效率 40L", "挖掘40行用最少的件數"},
+        ['dig_eff_100l']=   {"挖掘",        "效率 100L","挖掘100行用最少的件數"},
+        ['dig_eff_400l']=   {"挖掘",        "效率 400L","挖掘400行用最少的件數"},
         ['drought_n']=      {"乾旱",        "100L",     "你I沒了"},
         ['drought_l']=      {"乾旱+",       "100L",     "後 媽 發 牌"},
         ['marathon_n']=     {"馬拉松",       "普通",      "200行加速馬拉松"},
