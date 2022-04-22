@@ -3,6 +3,7 @@ return{
     env={
         noTele=true,
         mindas=7,minarr=1,minsdarr=1,
+        freshLimit=10,
         sequence="bagES",
         hook_drop=require'parts.eventsets.bigWallGen'.hook_drop,
         eventSet='big_s',
