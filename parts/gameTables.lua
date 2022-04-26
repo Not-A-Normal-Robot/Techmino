@@ -193,13 +193,13 @@ do--BLOCKS
     local O,_=true,false
     BLOCKS={
         --Tetromino
-        {{_,O,O},{O,O,_}},--Z
-        {{O,O,_},{_,O,O}},--S
-        {{O,O,O},{O,_,_}},--J
-        {{O,O,O},{_,_,O}},--L
-        {{O,O,O},{_,O,_}},--T
-        {{O,O},{O,O}},    --O
-        {{O,O,O,O}},      --I
+        {{_,_,O,O,O,O},{_,_,O,O,O,O},{O,O,O,O,_,_},{O,O,O,O,_,_}},--Z
+        {{O,O,O,O,_,_},{O,O,O,O,_,_},{_,_,O,O,O,O},{_,_,O,O,O,O}},--S
+        {{O,O,O,O,O,O},{O,O,O,O,O,O},{O,O,_,_,_,_},{O,O,_,_,_,_}},--J
+        {{O,O,O,O,O,O},{O,O,O,O,O,O},{_,_,_,_,O,O},{_,_,_,_,O,O}},--L
+        {{O,O,O,O,O,O},{O,O,O,O,O,O},{_,_,O,O,_,_},{_,_,O,O,_,_}},--T
+        {{O,O,O,O},{O,O,O,O},{O,O,O,O},{O,O,O,O}},    --O
+        {{O,O,O,O,O,O,O,O},{O,O,O,O,O,O,O,O}},      --I
 
         --Pentomino
         {{_,O,O},{_,O,_},{O,O,_}},--Z5
