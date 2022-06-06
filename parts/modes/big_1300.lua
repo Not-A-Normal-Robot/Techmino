@@ -6,7 +6,7 @@ return{
         freshLimit=10,
         sequence="bagES",
         hook_drop=require'parts.eventsets.bigWallGen'.hook_drop,
-        eventSet='big_s',
+        eventSet='big_1300',
         bg='lightning',bgm='secret7th remix',
     },
     score=function(P)return{P.stat.row,P.stat.time}end,
