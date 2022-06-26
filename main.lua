@@ -221,7 +221,7 @@ do--Z.setOnFocus
             if SCN.cur=='game'and SETTING.autoPause then
                 pauseGame()
             end
-            if SETTING.autoMute then
+            if SETTING.autoMute and SCN.cur~='music' then
                 TASK.removeTask_code(task_autoSoundOn)
                 TASK.new(task_autoSoundOff)
             end
@@ -385,7 +385,6 @@ LANG.init('zh',
         pt=require'parts.language.lang_pt',
         id=require'parts.language.lang_id',
         ja=require'parts.language.lang_ja',
-        zh_grass=require'parts.language.lang_zh_grass',
         symbol=require'parts.language.lang_symbol',
         --1. Add language file to LANG folder;
         --2. Require it;
@@ -525,8 +524,8 @@ do
         fs.remove('record/rhythm_h.rec')
         fs.remove('record/rhythm_u.rec')
     end
-    if RANKS.bigbang then
-        RANKS.clearRush,RANKS.bigbang=RANKS.bigbang
+    if RANKS.bigbang or RANKS.clearRush then
+        fs.remove('record/clearRush.rec')
         fs.remove('record/bigbang.rec')
     end
     if STAT.version~=VERSION.code then

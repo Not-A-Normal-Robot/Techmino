@@ -15,7 +15,7 @@ return{
     {font=65,name="世界沃德"},
     {font=65,name="Petris"},
     {font=65,name="Zakeru"},
-    {font=65,name="镝"},
+    {font=65,name="Dysprosium"},
     {font=65,name="HitachiMako"},
     {font=65,name="我慌死了"},
     {font=65,name="PESWGGL"},
@@ -32,6 +32,7 @@ return{
     {font=65,name="[**昆]"},
     {font=65,name="[**浩]"},
     {font=65,name="sakurw"},
+    {font=65,name="[**霖]"},
 
     {font=25,name="八零哥"},
     {font=25,name="蕴空之灵"},
@@ -133,4 +134,8 @@ return{
     {font=25,name="你的忘机已上羡"},
     {font=25,name="茗妖屿沉"},
     {font=25,name="Not Tomorrow"},
+    {font=25,name="[**水]"},
+    {font=25,name="[**萩]"},
+    {font=25,name="gong"},
+    {font=25,name="T2003.George2003"},
 }
