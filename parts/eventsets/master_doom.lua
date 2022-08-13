@@ -1,69 +1,77 @@
--- inspired by goldenyoshi22#0101's master_doom mode, modified
--- section:       0  1  2  3  4   5  6  7  8  9   10 11 12 13 14  15 16 17 ROLL
-local doom_lock={11,11,11,10,10, 10,10, 9, 9, 9,  9, 8, 8, 8, 8,  7, 7, 7, 7}
-local doom_wait={ 5, 5, 5, 5, 5,  4, 4, 4, 4, 4,  4, 4, 4, 3, 3,  3, 3, 3, 4}
-local doom_fall={10,10, 9, 9, 8,  8, 7, 7, 6, 6,  6, 5, 5, 5, 4,  4, 4, 3, 4}
-local doom_das ={ 5, 5, 5, 5, 5,  5, 5, 4, 4, 4,  4, 4, 4, 3, 3,  3, 3, 2, 2}
+-- inspired by goldenyoshi22#0101's master_doom mode
+-------------------------<LOCAL VARIABLES>-------------------------
+-- section:        0   1   2   3   4   5  6  7  8  9  10 11 12 13 14  15 16 17 ROLL
+local doom_lock={ 11, 11, 11, 10, 10, 10,10, 9, 9, 9,  9, 8, 8, 8, 8,  7, 7, 7,  7}
+local doom_wait={  5,  5,  5,  5,  5,  4, 4, 4, 4, 4,  4, 4, 4, 3, 3,  3, 3, 3,  3}
+local doom_fall={ 10, 10,  9,  9,  8,  8, 7, 7, 6, 6,  6, 5, 5, 5, 4,  4, 4, 3,  3}
+local doom_das ={  5,  5,  5,  5,  5,  5, 5, 4, 4, 4,  4, 4, 4, 3, 3,  3, 3, 3,  3}
+local doom_garb={nil,nil,nil,nil,nil, 20,18,16,14,12, 11,10, 9, 9, 8,  8, 8, 7,nil}
 
 local gc=love.graphics
+local gc_translate,gc_rotate,gc_push,gc_pop=gc.translate,gc.rotate,gc.push,gc.pop
+local gc_stencil,gc_rectangle,gc_scale=gc.stencil,gc.rectangle,gc.scale
+local gc_setColor,gc_setStencilTest=gc.setColor,gc.setStencilTest
+local gc_draw,gc_print=gc.draw,gc.print
 
-local function drawTorikanText(D)
-    if D.torikanTimer>=0 and D.torikanTimer<200 then            
-        gc.setColor(1,1,0,1)
-        mStr("EXCELLENT",300,200)
-        if D.torikanTimer>120 then return end
-        gc.setColor(1,1,1,1)
-        mStr("but...",300,260)
-        if D.torikanTimer>40 then return end
-        mStr("let's go better",300,320)
-        mStr("next time",300,370)
-        if D.torikanTimer>0 then return end
-        local diff=(D.torikanTime-D.torikanGoal)/60
-        if     diff>=60 then gc.setColor(1,0,0,1)
-        elseif diff>=45 then gc.setColor(1  ,0.2,0,1)
-        elseif diff>=30 then gc.setColor(1  ,0.4,0,1)
-        elseif diff>=20 then gc.setColor(1  ,0.6,0,1)
-        elseif diff>=15 then gc.setColor(1  ,0.8,0,1)
-        elseif diff>=10 then gc.setColor(1  ,1,  0,1)
-        elseif diff>=5  then gc.setColor((love.timer.getTime()%0.1)<0.05 and 1 or 0.5,1,  0,1)
-        else                 gc.setColor((love.timer.getTime()%0.04)<0.02 and 1 or 0.2,1,  0,1) end
-        mStr(STRING.time(D.torikanTime/60).." / "..STRING.time(D.torikanGoal/60).."\n(+"..diff.."s)",300,480)
+local border=GC.DO{334,620,
+    {'setLW',2},
+    {'dRect',16,1,302,618}
+}
+local drawFrames=0
+
+-------------------------</LOCAL VARIABLES>-------------------------
+-------------------------<LOCAL FUNCTIONS>-------------------------
+
+local function _boardTransform(mode)
+    if mode then
+        if mode=="U-D"then
+            gc_translate(0,590)
+            gc_scale(1,-1)
+        elseif mode=="L-R"then
+            gc_translate(300,0)
+            gc_scale(-1,1)
+        elseif mode=="180"then
+            gc_translate(300,590)
+            gc_scale(-1,-1)
+        end
     end
 end
+local function _stencilBoard()gc_rectangle('fill',0,-10,300,610)end
+local function _applyField(P)
+    gc_push('transform')
 
-local function slowClear(P) -- gimmick where lines are only cleared every 20 levels
-    local D=P.modeData
-    local l=D.pt
-    -- if (l<1300 or l>1799) or l%100==99 then
-    --     P.gameEnv.fillClear=true
-    --     P:clearFilledLines(P.garbageBeneath+1,#P.field-P.garbageBeneath)
-    --     return
-    -- end
-    P.gameEnv.fillClear=false
-    if math.floor(D.pt/10)>math.floor(D.prev_pt/10) then --check if 20 levels have passed
-        P:clearFilledLines(P.garbageBeneath+1,#P.field-P.garbageBeneath)
-    elseif #P.field>=11 then
-        local _r,_g=P:clearFilledLines(11,#P.field-11)
-        local _c=_r+_g
-        if _c>0 then P:clearFilledLines(11,#P.field-11) end
-        return _c
+    --Apply shaking
+    if P.shakeTimer>0 then
+        local dx=math.floor(P.shakeTimer/2)
+        local dy=math.floor(P.shakeTimer/3)
+        gc_translate(dx^1.6*(dx%2*2-1)*(P.gameEnv.shakeFX+1)/30,dy^1.4*(dy%2*2-1)*(P.gameEnv.shakeFX+1)/30)
     end
+
+    --Apply swingOffset
+    local O=P.swingOffset
+    if P.gameEnv.shakeFX then
+        local k=P.gameEnv.shakeFX
+        gc_translate(O.x*k+150+150,O.y*k+300)
+        gc_rotate(O.a*k)
+        gc_translate(-150,-300)
+    else
+        gc_translate(150,0)
+    end
+
+    --Apply stencil
+    gc_stencil(_stencilBoard)
+    gc_setStencilTest('equal',1)
+
+    --Move camera
+    gc_push('transform')
+    _boardTransform(P.gameEnv.flipBoard)
+    gc_translate(0,P.fieldBeneath+P.fieldUp)
 end
 
-local function getGimmick(lvl)
-    if lvl<500 then return ""
-    elseif lvl<1000 then return "- Garbage"
-    elseif lvl<1200 then return "- Bone"
-    elseif lvl<1300 then return "- Bone\n- Garbage"
-    elseif lvl<1400 then return "- Bone\n- Freeze"
-    elseif lvl<1500 then return "- Bone\n- Garbage\n- Fading"
-    elseif lvl<1600 then return "- Bone\n- Garbage\n- Slow Invis"
-    elseif lvl<1700 then return "- Bone\n- Garbage\n- Medium Invis"
-    elseif lvl<1800 then return "- Bone\n- Garbage\n- Fast Invis"
-    else return "- Bone\n- Big\n- Instant Invis"end
-end
+local function getSection(lvl) return lvl==1799 and 19 or math.floor(lvl/100)+1 end
 
 local function sendGarbage(P)
+    SFX.play('warn_1')
     if P.cur then return end
     local arr=LINE.new(0)
     if #P.field>0 then
@@ -75,8 +83,162 @@ local function sendGarbage(P)
     table.insert(P.field,1,arr)
     table.insert(P.visTime,1,LINE.new(20))
     P.fieldBeneath=P.fieldBeneath+30
-    P.modeData.sendGarbage=false
+    P.modeData.garbageCounter=0
 end
+
+local function drawGarbageMeter(P,fill,color)
+    if not fill then return
+    elseif fill<=0 then return end
+
+    local f=600*math.min(fill,1)
+    _applyField(P)
+    gc_setStencilTest()
+    gc_setColor(color and color or COLOR.Z)
+    gc_rectangle('fill',303,600-f,11,f,2)
+    gc_pop()
+    gc_pop()
+end
+
+-------------------------<ULTRABONE LOCAL FUNCTIONS>-------------------------
+local ultraBone={}
+ultraBone.bone=GC.DO{30,30,
+    -- left/right vertical line
+    {'fRect',3,6,4,20},
+    {'fRect',23,6,4,20},
+
+    -- top horizontal lines
+    {'fRect',7,6,5,2},
+    {'fRect',18,6,5,2},
+
+    -- bottom horizontal lines
+    {'fRect',7,24,5,2},
+    {'fRect',18,24,5,2},
+}
+ultraBone.drawBlock=function(x,y)gc.draw(ultraBone.bone,30*x+120,30*y)end
+ultraBone.drawActive=function(CB,curX,curY)
+    for i=1,#CB do for j=1,#CB[1]do
+        if CB[i][j]then
+            gc_draw(ultraBone.bone,30*(j+curX-1)-30,-30*(i+curY-1))
+        end
+    end end
+end
+ultraBone.drawXs=function(B,fieldH,fieldBeneath,hold)
+    gc_setColor(0,1,0,(hold and .3 or .8))
+    local y=math.floor(fieldH+1-math.modf(B.RS.centerPos[B.id][B.dir][1]))+math.ceil(fieldBeneath/30)+(hold and .14 or 0)
+    B=B.bk
+    local x=math.floor(6-#B[1]*.5)
+    local cross=TEXTURE.puzzleMark[-1]
+    for i=1,#B do for j=1,#B[1]do
+        if B[i][j]then
+            gc_draw(cross,30*(x+j-2),30*(1-y-i))
+        end
+    end end
+end
+ultraBone.drawLvl=function(s1,s2)
+    FONT.set(40,'mono')
+    mStr(s1,62,322)
+    mStr(s2,62,376)
+    gc_rectangle('fill',15,375,90,4)
+end
+ultraBone.drawMisc=function(P)
+    local D=P.modeData
+    -- time
+    FONT.set(25,'mono')
+    local tm=STRING.time(P.stat.time)
+    gc_print(tm,20,540)
+
+    -- score
+    gc_print(math.ceil(P.score1),18,509)
+
+    -- finesse counter
+    if P.finesseCombo>2 then
+        local S=P.stat
+        local str=P.finesseCombo.."x"
+        if S.finesseRate==5*S.piece then gc_setColor(1,0,0)
+        elseif S.maxFinesseCombo==S.piece then gc_setColor(1,1,0)
+        else gc_setColor(0,1,0)end
+        gc_print(str,20,570)
+    end
+    gc_setColor(0,1,0,1)
+
+    -- Lock Delay Bar & Lock Delay Reset Counter
+    if P.cur and P.lockDelay and P.lockDelay>0 then gc_rectangle('fill',150,600,300*(P.lockDelay/P.gameEnv.lock),6) end
+    for i=1,math.min(P.freshTime,15) do
+        gc_rectangle('fill',130+20*i,615,14,5)
+    end
+
+    -- B2B Bar
+    gc_rectangle('fill',135,600-P.b2b*.6,11,P.b2b*.6)
+
+    -- Garbage Bar
+    local g=doom_garb[getSection(D.pt)]
+    if g then
+        local c=D.garbageCounter
+        if c>0 then gc_rectangle('fill',450,600-c/g*600,11,c/g*600) end
+    elseif D.rollTransTimer<300 then
+        local r=D.rollStartTime -- [R]oll start time
+        local e=r+60 -- [E]nd of roll
+        local t=P.stat.time -- current [T]ime
+        if e>t then
+            local p=1-(t-r)/(e-r)
+            gc_rectangle('fill',450,600-p*600,11,p*600)
+        end
+    end
+
+    ultraBone.drawSpeed(499,505,P.dropSpeed)
+    FONT.set(30,'mono')
+    mStr(P.username,300,-60)
+end
+ultraBone.drawSpeed=function(x,y,speed)
+    local needle=GC.DO{30,9,{'fRect',5,3,21,3}}
+    gc_setColor(0,1,0,1)
+    gc_draw(TEXTURE.dial.frame,x,y)
+    gc_draw(needle,x+40,y+40,2.094+(speed<=175 and .02094*speed or 4.712-52.36/(speed-125)),nil,nil,1,1)
+    FONT.set(30,'mono')mStr(math.floor(speed),x+40,y+19)
+end
+ultraBone.drawRoll=function(P)
+    local D=P.modeData
+    FONT.set(50,'mono')
+    if D.rollTransTimer<300 and D.rollTransTimer>0 then
+        if D.rollTransTimer<180 and D.rollTransTimer>=120 then mStr("3",300,150)
+        elseif D.rollTransTimer<120 and D.rollTransTimer>=60 then mStr("2",300,150)
+        elseif D.rollTransTimer<60 and D.rollTransTimer>=0 then mStr("1",300,150)
+        end
+    end
+    gc.rectangle('line',0,240,126,80)
+    FONT.set(45,'mono')
+    local T=D.rollStartTime+60-P.stat.time
+    mStr((T<10 and "%.2f" or "%.1f"):format(math.max(T,0)),65,250)
+end
+ultraBone.draw=function(P)
+    local D=P.modeData
+    local function stencil()gc_rectangle('fill',150,-10,300,610) end
+    gc_stencil(stencil)
+    gc_setStencilTest('equal',1)
+    for i=1,#P.field do for j=1,#P.field[i] do
+        if P.field[i][j]~=0 then
+            gc_setColor(0,1,0,P.visTime[i][j]*0.05)
+            ultraBone.drawBlock(j,20-i)
+        end
+    end end
+    gc_setColor(0,1,0,1)
+    gc_push('transform')
+        gc_translate(150,600)
+        if P.cur then ultraBone.drawActive(P.cur.bk,P.curX,P.curY) end
+        ultraBone.drawXs(P.nextQueue[1],P.gameEnv.fieldH,P.fieldBeneath,false)
+        local h=P.holdQueue[1]
+        if h then ultraBone.drawXs(h,P.gameEnv.fieldH,P.fieldBeneath,true) end
+        gc_setStencilTest()
+        gc_setColor(0,1,0,1)
+        if h then ultraBone.drawActive(h.bk,-4,19) end
+        for i=1,P.gameEnv.nextCount do ultraBone.drawActive(P.nextQueue[i].bk,12,23-3*i)end
+    gc_pop()
+    if D.rollStarted then ultraBone.drawRoll(P)
+    else ultraBone.drawLvl(D.pt,D.target)end
+    ultraBone.drawMisc(P)
+end
+-------------------------</ULTRABONE LOCAL FUNCTIONS>-------------------------
+-------------------------<EVENTSET>-------------------------
 
 return{
     drop=0,
@@ -85,95 +247,160 @@ return{
     fall=doom_fall[1],
     noTele=true,
     das=doom_das[1],arr=1,
-    mesDisp=function(P)
+    mesDisp=function(P,repMode)
         D=P.modeData
+        if D.ultraBone then goto skip_ultraBone end
         PLY.draw.drawProgress(D.pt,D.target)
-        drawTorikanText(D)
-        gc.setColor(1,1,1,1)
-        setFont(20)
-        mStr(getGimmick(D.pt),700,0)
+
+        -- draw torikan text
+        if D.torikanTimer>=0 and D.torikanTimer<200 then
+            gc_setColor(1,1,0,1)
+            mStr("EXCELLENT",300,200)
+            if D.torikanTimer>120 then return end
+            gc_setColor(1,1,1,1)
+            mStr("but...",300,260)
+            if D.torikanTimer>40 then return end
+            mStr("let's go better",300,320)
+            mStr("next time",300,370)
+            if D.torikanTimer>0 then return end
+            local diff=(D.torikanTime-D.torikanGoal)/60
+            if     diff>=60 then gc_setColor(1,0,0,1)
+            elseif diff>=45 then gc_setColor(1  ,0.2,0,1)
+            elseif diff>=30 then gc_setColor(1  ,0.4,0,1)
+            elseif diff>=20 then gc_setColor(1  ,0.6,0,1)
+            elseif diff>=15 then gc_setColor(1  ,0.8,0,1)
+            elseif diff>=10 then gc_setColor(1  ,1,  0,1)
+            elseif diff>=5  then gc_setColor((love.timer.getTime()%0.1)<0.05 and 1 or 0.5,1,  0,1)
+            else                 gc_setColor((love.timer.getTime()%0.04)<0.02 and 1 or 0.2,1,  0,1) end
+            diff=string.format('%.3f',diff)
+            mStr(STRING.time(D.torikanTime/60).." / "..STRING.time(D.torikanGoal/60).."\n(+"..diff.."s)",300,480)
+        end
+
+        if doom_garb[getSection(D.pt)] then drawGarbageMeter(P,D.garbageCounter/doom_garb[getSection(D.pt)]) end
+
+        ::skip_ultraBone::
+        if D.ultraBone then
+            if not repMode then gc.clear(0,0,0)else
+                gc_setColor(0,0,0,.7)
+                gc_rectangle('fill',-5e4,-5e4,1e5,1e5)
+            end
+            gc_setColor(0,1,0)
+            if D.torikanTimer>=0 and D.torikanTimer<200 then
+                mStr("EXCELLENT",300,200)
+                if D.torikanTimer>120 then return end
+                mStr("but...",300,260)
+                if D.torikanTimer>40 then return end
+                mStr("let's go better",300,320)
+                mStr("next time",300,370)
+                if D.torikanTimer>0 then return end
+                local diff=string.format('%.3f',(D.torikanTime-D.torikanGoal)/60)
+                mStr(STRING.time(D.torikanTime/60).." / "..STRING.time(D.torikanGoal/60).."\n(+"..diff.."s)",300,480)
+            end
+            gc.draw(border,-17+150,-12)
+
+            ultraBone.draw(P)
+            if drawFrames%300==0 then collectgarbage('collect') end
+        end
+        drawFrames=drawFrames+1
     end,
     hook_drop=function(P)
         local D=P.modeData
-        D.prev_pt=D.pt
-        -- D.sendGarbage=true
-        local c=#P.clearedRow
-        local s,_c=nil
-        if c==0 and D.pt%100==99 then
-            _c=slowClear(P)
-            if _c~=nil and _c>0 then goto calc_frozen_lines end
+
+        if D.rollStarted then
+            D.rollLines=D.rollLines+#P.clearedRow
             return
         end
-        s=c<3 and c+1 or c==3 and 5 or 7
+
+
+        if doom_garb[getSection(D.pt)] then D.garbageCounter=math.max(D.garbageCounter+1-#P.clearedRow,0) end
+        local c=#P.clearedRow
+        if c==0 and D.pt+1==D.target then return end
+        local s=c<3 and c+1 or c==3 and 5 or 7
         if P.combo>7 then s=s+2
         elseif P.combo>3 then s=s+1
         end
         D.pt=math.min(D.pt+s,1800)
 
-        _c=slowClear(P)
-        ::calc_frozen_lines::
-        if _c==nil then goto skip_frozen_lines end
-        s=_c<3 and _c+1 or _c==3 and 5 or 7
-        D.pt=math.min(D.pt+s,1800)
-        ::skip_frozen_lines::
-
-        if D.pt%100==99 and not D.rollStarted then
+        if D.pt+1==D.target and not D.rollStarted then
             SFX.play('warn_1')
         elseif D.pt>=D.target and not D.rollStarted then--Level up!
-            s=D.target/100
+            s=D.target==1799 and 18 or D.target/100
             local E=P.gameEnv
-            E.lock=doom_lock[s]
-            E.wait=doom_wait[s]
-            E.fall=doom_fall[s]
-            if E.das~=doom_das[s] then E.das=doom_das[s] end
+            E.lock=doom_lock[s+1]
+            E.wait=doom_wait[s+1]
+            E.fall=doom_fall[s+1]
+            if E.das~=doom_das[s+1] then E.das=doom_das[s+1] end
 
             if s==2 then BG.set('rainbow')
             elseif s==4 then BG.set('rainbow2')
             elseif s==5 then
-                if P.stat.frame>135*60 then -- torikan: 2min 15s
+                if P.stat.time>135 then -- torikan: 2min 15s
                     D.pt=500
                     P.waiting=1e99
                     D.torikanTimer=300
                     D.torikanGoal=135*60
-                    D.torikanTime=P.stat.frame
+                    D.torikanTime=P.stat.time/60
                     BGM.stop()
                     return
                 else
                     P.gameEnv.freshLimit=9
                     BG.set('glow')
-                    BGM.play('secret7th remix')
+                    BGM.play('reason')
                 end
             elseif s==6 then BG.set('lightning')
-            elseif s==10 then 
-                if P.stat.frame>285*60 then -- torikan: 4min 30s
+            elseif s==10 then
+                if P.stat.time>270 then -- torikan: 4min 30s
                     D.pt=1000
                     P.waiting=1e99
                     D.torikanTimer=300
                     D.torikanGoal=285*60
-                    D.torikanTime=P.stat.frame
+                    D.torikanTime=P.stat.time/60
                     BGM.stop()
                     return
                 end
                 E.bone=true
+                BGM.play('down')
+            elseif s==12 then
+                BG.set('none')
+                P.gameEnv.shakeFX=0
+                D.ultraBone=true
+                P.waiting=40
+                BGM.play('rectification')
+                -- ultrabone optimization
+                P.gameEnv.smooth=false
+                P.gameEnv.block=false
+                P.gameEnv.lockFX=false
+                P.gameEnv.dropFX=false
+                P.gameEnv.moveFX=false
+                P.gameEnv.clearFX=false
+                P.gameEnv.splashFX=false
+                P.gameEnv.text=false
+                P.gameEnv.score=false
+                P.gameEnv.highCam=false
+                P.gameEnv.showSpike=false
+                P.gameEnv.upEdge=false
             elseif s==15 then 
-                if P.stat.frame>405*60 then -- torikan: 6min 45s
-                    D.pt=1000
+                if P.stat.time>405 then -- torikan: 6min 45s
+                    D.pt=1500
                     P.waiting=1e99
                     D.torikanTimer=300
                     D.torikanGoal=405*60
-                    D.torikanTime=P.stat.frame
+                    D.torikanTime=P.stat.time/60
                     BGM.stop()
                     return
                 end
+                BGM.play('distortion')
                 P:setInvisible(150)
             elseif s==16 then P:setInvisible(50)
             elseif s==17 then P:setInvisible(15)
-            elseif s==18 then 
+            elseif s==18 then
+                BGM.play('final')
                 P:setInvisible(0)
                 D.rollStarted=true
                 P.waiting=300
+                D.pt=1799
             end
-            D.target=D.target+100
+            D.target=D.target==1700 and 1799 or D.target+100
             P:stageComplete(s)
             SFX.play('reach')
         end
@@ -182,19 +409,23 @@ return{
         D=P.modeData
         P:set20G(true)
         D.pt=0
-        D.pt=0
         D.target=100
         D.torikanTimer=-1
         D.rollStarted=false
         D.rollTransTimer=300
+        D.ultraBone=false
+        D.rollLines=0
         while true do
+            local prevTime=P.stat.time
+            local prevFrame=P.stat.frame
             YIELD()
-            
+
             if D.torikanTimer>=0 then
                 for y=1,#P.field do for x=1,10 do
                     P.visTime[y][x]=D.torikanTimer-240
                 end end
                 D.torikanTimer=D.torikanTimer>0 and math.max(D.torikanTimer-1,0) or D.torikanTimer
+                P.stat.time,P.stat.frame=prevTime,prevFrame
             end
             if D.torikanTimer==0 then P:win('finish') return end
 
@@ -202,28 +433,28 @@ return{
             if D.rollTransTimer>=0 and D.rollStarted then
                 D.rollTransTimer=D.rollTransTimer-1
             end
-            if D.rollTransTimer<300 then
+            if D.rollTransTimer<300 and D.rollTransTimer>240 then
                 for y=1,#P.field do for x=1,10 do
                     P.visTime[y][x]=D.rollTransTimer-240
                 end end
             end
-            if D.rollTransTimer==240 then 
+            if D.rollTransTimer<300 and D.rollTransTimer>0 then
+                D.rollStartTime=P.stat.time
+            end
+            if D.rollTransTimer==240 then
                 TABLE.cut(P.field)
                 TABLE.cut(P.visTime)
-            elseif D.rollTransTimer==180 then
-                playReadySFX(3,3)
-                P:_showText("3",0,-120,120,'fly',1)
-            elseif D.rollTransTimer==120 then
-                playReadySFX(2,2)
-                P:_showText("2",0,-120,120,'fly',1)
-            elseif D.rollTransTimer==60 then
-                playReadySFX(1,1)
-                P:_showText("1",0,-120,120,'fly',1)
+            elseif D.rollTransTimer==180 then playReadySFX(3,3)
+            elseif D.rollTransTimer==120 then playReadySFX(2,2)
+            elseif D.rollTransTimer==60 then playReadySFX(1,1)
             elseif D.rollTransTimer==0 then
                 playReadySFX(0,1)
+                D.rollStartTime=P.stat.time
             end
 
-            if D.sendGarbage then sendGarbage(P) end
+            if P.stat.time>D.rollStartTime+60 then P:win('finish') end
+
+            if doom_garb[getSection(D.pt)] and D.garbageCounter>doom_garb[getSection(D.pt)] then sendGarbage(P) end
         end
     end,
 }

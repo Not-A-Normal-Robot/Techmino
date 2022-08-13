@@ -3,7 +3,7 @@ return{
         freshLimit=12,
         sequence="bagES",
         eventSet='master_doom',
-        bg='bg2',bgm='secret7th',
+        bg='bg2',bgm='super7th',
     },
     slowMark=true,
     score=function(P)return{P.modeData.pt,P.stat.time}end,
@@ -14,11 +14,11 @@ return{
     getRank=function(P)
         local S=P.modeData.pt
         return
-            S>=1000 and 5 or
-            S>=800 and 4 or
-            S>=500 and 3 or
-            S>=300 and 2 or
-            S>=100 and 1 or
-            S>=60 and 0
+            P.result=='win'and 5 or
+            S>=1500 and 4 or
+            S>=1200 and 3 or
+            S>=600 and 2 or
+            S>=300 and 1 or
+            S>=50 and 0
     end,
 }
