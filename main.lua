@@ -30,7 +30,7 @@ SAVEDIR=fs.getSaveDirectory()
 
 --Global Vars & Settings
 SFXPACKS={'chiptune'}
-VOCPACKS={'miya','mono','xiaoya','miku'}
+VOCPACKS={'miya','mono','xiaoya','miku','rin'}
 FIRSTLAUNCH=false
 DAILYLAUNCH=false
 
@@ -221,7 +221,7 @@ do--Z.setOnFocus
             if SCN.cur=='game'and SETTING.autoPause then
                 pauseGame()
             end
-            if SETTING.autoMute then
+            if SETTING.autoMute and SCN.cur~='music' then
                 TASK.removeTask_code(task_autoSoundOn)
                 TASK.new(task_autoSoundOff)
             end
@@ -291,6 +291,7 @@ IMG.init{
     xiaoyaCH='media/image/characters/xiaoya.png',
     xiaoyaOmino='media/image/characters/xiaoya_Omino.png',
     mikuCH='media/image/characters/miku.png',
+    rinCH='media/image/characters/rin.png',
     z={
         character='media/image/characters/z_character.png',
         screen1='media/image/characters/z_screen1.png',
@@ -340,6 +341,9 @@ SKIN.load{
     {name="ball_shaw",path='media/image/skin/ball_shaw.png'},
     {name="retro_notypey",path='media/image/skin/retro_notypey.png'},
     {name="pixel_chno",path='media/image/skin/pixel_chno.png'},
+    {name="pastel_chno",path='media/image/skin/pastel_chno.png'},
+    {name="letters_chno",path='media/image/skin/letters_chno.png'},
+    {name="kanji_chno",path='media/image/skin/kanji_chno.png'},
     {name="textbone_mrz",path='media/image/skin/textbone_mrz.png'},
     {name="coloredbone_mrz",path='media/image/skin/coloredbone_mrz.png'},
     {name="wtf",path='media/image/skin/wtf_mrz.png'},
@@ -386,6 +390,7 @@ LANG.init('zh',
         id=require'parts.language.lang_id',
         ja=require'parts.language.lang_ja',
         symbol=require'parts.language.lang_symbol',
+        zh_code=require'parts.language.lang_zh_code',
         --1. Add language file to LANG folder;
         --2. Require it;
         --3. Add a button in parts/scenes/lang.lua;
