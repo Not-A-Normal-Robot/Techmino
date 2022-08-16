@@ -14,7 +14,7 @@ return{
     getRank=function(P)
         local S=P.modeData.pt
         return
-            P.result=='win'and 5 or
+            (P.result=='win' and S>=1799)and 5 or
             S>=1500 and 4 or
             S>=1200 and 3 or
             S>=600 and 2 or

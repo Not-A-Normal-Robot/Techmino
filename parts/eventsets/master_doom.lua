@@ -115,12 +115,26 @@ ultraBone.bone=GC.DO{30,30,
     {'fRect',18,24,5,2},
 }
 ultraBone.drawBlock=function(x,y)gc.draw(ultraBone.bone,30*x+120,30*y)end
-ultraBone.drawActive=function(CB,curX,curY)
-    for i=1,#CB do for j=1,#CB[1]do
-        if CB[i][j]then
-            gc_draw(ultraBone.bone,30*(j+curX-1)-30,-30*(i+curY-1))
-        end
-    end end
+ultraBone.drawActive=function(UB,CB,curX,curY) -- UltraBone, Current Block, P.curX, P.curY
+    if UB==1 then
+        for i=1,#CB do for j=1,#CB[1]do
+            if CB[i][j]then gc_draw(ultraBone.bone,30*(j+curX-1)-30,-30*(i+curY-1))end
+        end end
+    else
+        for i=1,#CB do for j=1,#CB[1] do
+            if CB[i][j] then
+                local x,y=30*(curX+j)+120,30*(19-i+curY)
+                -- Up border
+                if not (CB[i+1]and CB[i+1][j]) then gc_rectangle("fill",x,y+30,30,2) end
+                -- Left border
+                if not (CB[i][j-1]and CB[i][j-1]) then gc_rectangle("fill",x,y+30,2,30) end
+                -- Right border
+                if not (CB[i][j+1]and CB[i][j+1]) then gc_rectangle("fill",x+28,y+30,2,30) end
+                -- Down border
+                if not (CB[i-1]and CB[i-1][j]) then gc_rectangle("fill",x,y+60,30,2) end
+            end
+        end end
+    end
 end
 ultraBone.drawXs=function(B,fieldH,fieldBeneath,hold)
     gc_setColor(0,1,0,(hold and .3 or .8))
@@ -210,29 +224,80 @@ ultraBone.drawRoll=function(P)
     local T=D.rollStartTime+60-P.stat.time
     mStr((T<10 and "%.2f" or "%.1f"):format(math.max(T,0)),65,250)
 end
-ultraBone.draw=function(P)
+ultraBone.draw=function(P,repMode)
     local D=P.modeData
+    local UB=D.ultraBone
     local function stencil()gc_rectangle('fill',150,-10,300,610) end
     gc_stencil(stencil)
     gc_setStencilTest('equal',1)
-    for i=1,#P.field do for j=1,#P.field[i] do
-        if P.field[i][j]~=0 then
-            gc_setColor(0,1,0,P.visTime[i][j]*0.05)
-            ultraBone.drawBlock(j,20-i)
+    local F=P.field
+    if UB==1 then
+        for i=1,#F do for j=1,#F[i] do
+            if F[i][j]~=0 then
+                gc_setColor(0,1,0,P.visTime[i][j]*0.05)
+                if repMode and P.visTime[i][j]<1 then gc_setColor(.4,.4,.4,1)end
+                ultraBone.drawBlock(j,20-i)
+            end
+        end end
+    else
+        local BF={}
+        for i=1,#F do
+            BF[i]={}
+            for j=1,#F[i]do
+                BF[i][j]=F[i][j]
+            end
         end
-    end end
+        if P.cur then
+            local B=P.cur.bk
+            for i=1,#B do for j=1,#B[1] do
+                if B[i][j] then
+                    if not BF[i+P.curY-1] then BF[i+P.curY-1]={0,0,0,0,0,0,0,0,0,0} end
+                    BF[i+P.curY-1][j+P.curX-1]=626
+                end
+            end end
+        end
+        for i=1,#BF do for j=1,#BF[i] do
+            if BF[i][j]~=0 then
+                gc_setColor(0,1,0,BF[i][j]==626 and 1 or P.visTime[i][j]*0.05)
+                if repMode and BF[i][j]~=626 and P.visTime[i][j]<1 then gc_setColor(.4,.4,.4,1)end
+                local x,y=30*j+120,30*(19-i)
+                -- Up border
+                if i+1>#BF or BF[i+1][j]==0 then gc_rectangle("fill",x,y+30,30,2) end
+                -- Left border
+                if j<2 or BF[i][j-1]==0 then gc_rectangle("fill",x,y+30,2,30) end
+                -- Right border
+                if j>9 or BF[i][j+1]==0 then gc_rectangle("fill",x+28,y+30,2,30) end
+                -- Down border
+                if i<2 or BF[i-1][j]==0 then gc_rectangle("fill",x,y+60,30,2) end
+            end
+        end end
+    end
     gc_setColor(0,1,0,1)
     gc_push('transform')
         gc_translate(150,600)
-        if P.cur then ultraBone.drawActive(P.cur.bk,P.curX,P.curY) end
+        if P.cur and UB==1 then ultraBone.drawActive(UB,P.cur.bk,P.curX,P.curY) end
         ultraBone.drawXs(P.nextQueue[1],P.gameEnv.fieldH,P.fieldBeneath,false)
         local h=P.holdQueue[1]
         if h then ultraBone.drawXs(h,P.gameEnv.fieldH,P.fieldBeneath,true) end
         gc_setStencilTest()
         gc_setColor(0,1,0,1)
-        if h then ultraBone.drawActive(h.bk,-4,19) end
-        for i=1,P.gameEnv.nextCount do ultraBone.drawActive(P.nextQueue[i].bk,12,23-3*i)end
+        if UB==1 then
+            if h then ultraBone.drawActive(UB,h.bk,-4,19)end
+            for i=1,P.gameEnv.nextCount do ultraBone.drawActive(UB,P.nextQueue[i].bk,12,23-3*i)end
+        end
     gc_pop()
+    if UB~=1 then
+        print(D.hideHold,(P.result=='win' or P.result=='lose' or repMode),D.hideHold and not (P.result=='win' or P.result=='lose' or repMode))
+        if h and not (D.hideHold and not (P.result=='win' or P.result=='lose' or repMode)) then
+            if D.hideHold then gc_setColor(.6,.6,.6) end
+            ultraBone.drawActive(UB,h.bk,-5,-18)
+            if D.hideHold then gc_setColor(0,1,0) end
+        elseif h then
+            FONT.set(62,'mono')
+            mStr("?",62,0)
+        end
+        for i=1,P.gameEnv.nextCount do ultraBone.drawActive(UB,P.nextQueue[i].bk,11,3*i-22)end
+    end
     if D.rollStarted then ultraBone.drawRoll(P)
     else ultraBone.drawLvl(D.pt,D.target)end
     ultraBone.drawMisc(P)
@@ -249,7 +314,11 @@ return{
     das=doom_das[1],arr=1,
     mesDisp=function(P,repMode)
         D=P.modeData
-        if D.ultraBone then goto skip_ultraBone end
+        if D.ultraBone then
+            gc_push('transform')
+            gc_translate(P.x,P.y)
+            goto skip_ultraBone
+        end
         PLY.draw.drawProgress(D.pt,D.target)
 
         -- draw torikan text
@@ -298,8 +367,9 @@ return{
             end
             gc.draw(border,-17+150,-12)
 
-            ultraBone.draw(P)
+            ultraBone.draw(P,repMode)
             if drawFrames%300==0 then collectgarbage('collect') end
+            gc_pop()
         end
         drawFrames=drawFrames+1
     end,
@@ -363,22 +433,10 @@ return{
             elseif s==12 then
                 BG.set('none')
                 P.gameEnv.shakeFX=0
-                D.ultraBone=true
+                P.draw=function(P,repMode)for i=1,#P.gameEnv.mesDisp do P.gameEnv.mesDisp[i](P,repMode)end end
+                D.ultraBone=1
                 P.waiting=40
                 BGM.play('rectification')
-                -- ultrabone optimization
-                P.gameEnv.smooth=false
-                P.gameEnv.block=false
-                P.gameEnv.lockFX=false
-                P.gameEnv.dropFX=false
-                P.gameEnv.moveFX=false
-                P.gameEnv.clearFX=false
-                P.gameEnv.splashFX=false
-                P.gameEnv.text=false
-                P.gameEnv.score=false
-                P.gameEnv.highCam=false
-                P.gameEnv.showSpike=false
-                P.gameEnv.upEdge=false
             elseif s==15 then 
                 if P.stat.time>405 then -- torikan: 6min 45s
                     D.pt=1500
@@ -389,9 +447,14 @@ return{
                     BGM.stop()
                     return
                 end
+                D.ultraBone=2
+                P.waiting=30
                 BGM.play('distortion')
                 P:setInvisible(150)
-            elseif s==16 then P:setInvisible(50)
+                D.drop=1e99
+            elseif s==16 then
+                P:setInvisible(50)
+                D.hideHold=true
             elseif s==17 then P:setInvisible(15)
             elseif s==18 then
                 BGM.play('final')
@@ -408,13 +471,14 @@ return{
     task=function(P)
         D=P.modeData
         P:set20G(true)
-        D.pt=0
+        D.pt=1200
         D.target=100
         D.torikanTimer=-1
         D.rollStarted=false
         D.rollTransTimer=300
         D.ultraBone=false
         D.rollLines=0
+        D.hideHold=false
         while true do
             local prevTime=P.stat.time
             local prevFrame=P.stat.frame
@@ -452,7 +516,7 @@ return{
                 D.rollStartTime=P.stat.time
             end
 
-            if P.stat.time>D.rollStartTime+60 then P:win('finish') end
+            if P.stat.time>D.rollStartTime+60 and D.rollTransTimer<0 then P:win('finish') end
 
             if doom_garb[getSection(D.pt)] and D.garbageCounter>doom_garb[getSection(D.pt)] then sendGarbage(P) end
         end
