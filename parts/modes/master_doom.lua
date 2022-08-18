@@ -6,10 +6,17 @@ return{
         bg='bg2',bgm='super7th',
     },
     slowMark=true,
-    score=function(P)return{P.modeData.pt,P.stat.time}end,
-    scoreDisp=function(D)return D[1].."P   "..STRING.time(D[2])end,
+    score=function(P)return{P.result=='win',P.modeData.pt,P.stat.time}end,
+    scoreDisp=function(D)
+        if D[1]and D[2]>=1799 then return"CLEAR   "..STRING.time(D[3])end
+        return D[2].."P   "..STRING.time(D[3])
+    end,
     comp=function(a,b)
-        return a[1]>b[1]or(a[1]==b[1]and a[2]<b[2])
+        return
+        (a[1]and not b[1]) -- clear?
+        or((a[1]==b[1]and a[2]>b[2]) -- pt
+        or (a[2]==b[2]and a[3]<b[3]) -- time
+        )
     end,
     getRank=function(P)
         local S=P.modeData.pt

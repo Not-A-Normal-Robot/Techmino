@@ -349,10 +349,6 @@ return{
 
         ::skip_ultraBone::
         if D.ultraBone then
-            if not repMode then gc.clear(0,0,0)else
-                gc_setColor(0,0,0,.7)
-                gc_rectangle('fill',-5e4,-5e4,1e5,1e5)
-            end
             gc_setColor(0,1,0)
             if D.torikanTimer>=0 and D.torikanTimer<200 then
                 mStr("EXCELLENT",300,200)
@@ -419,11 +415,11 @@ return{
                 end
             elseif s==6 then BG.set('lightning')
             elseif s==10 then
-                if P.stat.time>270 then -- torikan: 4min 30s
+                if P.stat.time>260 then -- torikan: 4min 20s
                     D.pt=1000
                     P.waiting=1e99
                     D.torikanTimer=300
-                    D.torikanGoal=285*60
+                    D.torikanGoal=260*60
                     D.torikanTime=P.stat.time/60
                     BGM.stop()
                     return
@@ -431,18 +427,18 @@ return{
                 E.bone=true
                 BGM.play('down')
             elseif s==12 then
-                BG.set('none')
+                BG.set('dos')
                 P.gameEnv.shakeFX=0
                 P.draw=function(P,repMode)for i=1,#P.gameEnv.mesDisp do P.gameEnv.mesDisp[i](P,repMode)end end
                 D.ultraBone=1
                 P.waiting=40
                 BGM.play('rectification')
             elseif s==15 then 
-                if P.stat.time>405 then -- torikan: 6min 45s
+                if P.stat.time>360 then -- torikan: 6min
                     D.pt=1500
                     P.waiting=1e99
                     D.torikanTimer=300
-                    D.torikanGoal=405*60
+                    D.torikanGoal=360*60
                     D.torikanTime=P.stat.time/60
                     BGM.stop()
                     return
@@ -472,7 +468,7 @@ return{
         D=P.modeData
         P:set20G(true)
         D.pt=1200
-        D.target=100
+        D.target=1200
         D.torikanTimer=-1
         D.rollStarted=false
         D.rollTransTimer=300
