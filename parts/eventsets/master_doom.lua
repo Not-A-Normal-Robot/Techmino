@@ -287,7 +287,6 @@ ultraBone.draw=function(P,repMode)
         end
     gc_pop()
     if UB~=1 then
-        print(D.hideHold,(P.result=='win' or P.result=='lose' or repMode),D.hideHold and not (P.result=='win' or P.result=='lose' or repMode))
         if h and not (D.hideHold and not (P.result=='win' or P.result=='lose' or repMode)) then
             if D.hideHold then gc_setColor(.6,.6,.6) end
             ultraBone.drawActive(UB,h.bk,-5,-18)
@@ -463,6 +462,9 @@ return{
             P:stageComplete(s)
             SFX.play('reach')
         end
+    end,
+    hook_die=function(P)
+        if P.modeData.pt>=1200 then BG.send('die')end
     end,
     task=function(P)
         D=P.modeData
