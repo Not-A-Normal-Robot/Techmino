@@ -80,15 +80,14 @@ function back.init()
         '> ')
     state='norm'
     timeSinceDeath=0
-    back.event('levelUp',{0,7,3,3,5,1e99,3,1,7,3})
 end
 function back.update(dt)
     t,totalT=t+dt,totalT+dt
     if state=='dead'then timeSinceDeath=timeSinceDeath+dt end
-    if state=='dead'and timeSinceDeath>=10 then
+    if state=='dead'and timeSinceDeath>=60 then
         state='cred'
-        pending=pending.."credits{\n\n}{Techmino\n}"
-        for i=1,#text.staff do pending=pending..'{'..text.staff[i]..'\n}'end
+        pending=pending.."credits{\n\n}{Techmino}"
+        for i=1,#text.staff do pending=pending..'{\n'..text.staff[i]..'}'end
         typeDelay=1
     end
 

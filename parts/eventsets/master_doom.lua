@@ -3,7 +3,7 @@
 -- section:        0   1   2   3   4   5  6  7  8  9  10 11 12 13 14  15 16 17 ROLL
 local doom_lock={ 11, 11, 11, 10, 10, 10,10, 9, 9, 9,  9, 8, 8, 8, 8,  7, 7, 7,  7}
 local doom_wait={  5,  5,  5,  5,  5,  4, 4, 4, 4, 4,  4, 4, 4, 3, 3,  3, 3, 3,  3}
-local doom_fall={ 10, 10,  9,  9,  8,  8, 7, 7, 6, 6,  6, 5, 5, 5, 4,  4, 4, 3,  3}
+local doom_fall={ 10, 10,  9,  9,  8,  8, 7, 6, 6, 5,  4, 4, 3, 3, 2,  2, 1, 0,  0}
 local doom_das ={  5,  5,  5,  5,  5,  5, 5, 4, 4, 4,  4, 4, 4, 3, 3,  3, 3, 3,  3}
 local doom_garb={nil,nil,nil,nil,nil, 20,18,16,14,12, 11,10, 9, 9, 8,  8, 8, 7,nil}
 
@@ -395,6 +395,17 @@ return{
             E.wait=doom_wait[s+1]
             E.fall=doom_fall[s+1]
             if E.das~=doom_das[s+1] then E.das=doom_das[s+1] end
+            if BG.cur=='dos'then 
+                BG.send('levelUp',
+                    {s+1,nil,
+                    doom_lock[s+1]==doom_lock[s]and nil or doom_lock[s+1],
+                    doom_wait[s+1]==doom_wait[s]and nil or doom_wait[s+1],
+                    doom_fall[s+1]==doom_fall[s]and nil or doom_fall[s+1],nil,nil,
+                    doom_das[s+1]==doom_das[s]and nil or doom_das[s+1],nil,
+                    doom_garb[s+1]==doom_garb[s]and nil or doom_garb[s+1],
+                    }
+                )
+            end
 
             if s==2 then BG.set('rainbow')
             elseif s==4 then BG.set('rainbow2')
@@ -464,12 +475,12 @@ return{
         end
     end,
     hook_die=function(P)
-        if P.modeData.pt>=1200 then BG.send('die')end
+        if P.modeData.pt>=1200 and BG.cur=='dos'then BG.send('die')end
     end,
     task=function(P)
         D=P.modeData
         P:set20G(true)
-        D.pt=1200
+        D.pt=1780
         D.target=1200
         D.torikanTimer=-1
         D.rollStarted=false
