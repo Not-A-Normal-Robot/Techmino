@@ -2,7 +2,7 @@ return{
     env={
         freshLimit=12,
         sequence="bagES",
-        eventSet='master_doom',
+        eventSet='master_u',
         bg='bg2',bgm='super7th',
     },
     slowMark=true,

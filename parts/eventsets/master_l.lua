@@ -324,13 +324,13 @@ return{
         if D.torikanTimer>=0 and D.torikanTimer<200 then
             gc_setColor(1,1,0,1)
             mStr("EXCELLENT",300,200)
-            if D.torikanTimer>120 then return end
+            if D.torikanTimer>120 then goto skip_ultraBone end
             gc_setColor(1,1,1,1)
             mStr("but...",300,260)
-            if D.torikanTimer>40 then return end
+            if D.torikanTimer>40 then goto skip_ultraBone end
             mStr("let's go better",300,320)
             mStr("next time",300,370)
-            if D.torikanTimer>0 then return end
+            if D.torikanTimer>0 then goto skip_ultraBone end
             local diff=(D.torikanTime-D.torikanGoal)/60
             if     diff>=60 then gc_setColor(1,0,0,1)
             elseif diff>=45 then gc_setColor(1  ,0.2,0,1)
@@ -444,7 +444,7 @@ return{
                 P.waiting=40
                 BGM.play('rectification')
             elseif s==15 then 
-                if P.stat.time>360 then -- torikan: 6min
+                if P.stat.time>400 then -- torikan: 6min 40s
                     D.pt=1500
                     P.waiting=1e99
                     D.torikanTimer=300
@@ -480,8 +480,8 @@ return{
     task=function(P)
         D=P.modeData
         P:set20G(true)
-        D.pt=1780
-        D.target=1200
+        D.pt=0 -- DEBUG
+        D.target=100
         D.torikanTimer=-1
         D.rollStarted=false
         D.rollTransTimer=300
