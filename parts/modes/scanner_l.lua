@@ -1,3 +1,5 @@
+-- Mode originally by Discord user hanamielle
+-- Keeping this because I like archiving stuff
 return{
     env={
         drop=1,lock=30,
