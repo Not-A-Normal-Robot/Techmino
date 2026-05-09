@@ -9,6 +9,13 @@ return {
         else
             GAME.modeEnv.hook_drop=NULL
         end
+
+        print("["..TIME().."]: Loaded! Press Enter in the console to continue")
+        io.read("*l")
+        print("["..TIME().."]: Continuing...")
+        local oldHook = GAME.modeEnv.hook_drop
+        GAME.modeEnv.hook_drop=function(P)oldHook(P) if P.stat.piece%1e6==0 then print("["..TIME().."] "..(P.stat.piece/1e3).."k")end end
+
         PLY.newPlayer(1)
         local AItype=GAME.modeEnv.opponent:sub(1,2)
         local AIlevel=tonumber(GAME.modeEnv.opponent:sub(-1))
